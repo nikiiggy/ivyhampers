@@ -37,7 +37,7 @@
     .a4-page {
       width: 210mm; min-height: 297mm; box-sizing: border-box; position: relative;
       background-color: #fff;
-      background-image: url('https://i.ibb.co.com/NnyzG8Xt/SURAT-01.jpg');
+      background-image: url('https://i.ibb.co.com/qLQt4JRX/SURAT-01-Copy.jpg');
       background-size: 100% 100%; background-repeat: no-repeat; background-position: center;
       padding: 53mm 13mm 13mm 13mm; /* atas 53mm, sisi/bawah 13mm */
       transform-origin: top left;
@@ -147,13 +147,21 @@
           </div>
         </details>
 
-        <details class="sec rounded-2xl border border-stone-200 bg-white">
+        <details class="sec rounded-2xl border border-stone-200 bg-white" open>
           <summary class="flex items-center justify-between px-4 py-4">
             <span class="font-semibold">Pembayaran &amp; DP</span>
             <svg class="chev h-5 w-5 text-stone-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.3 7.3a1 1 0 011.4 0L10 10.6l3.3-3.3a1 1 0 111.4 1.4l-4 4a1 1 0 01-1.4 0l-4-4a1 1 0 010-1.4z" clip-rule="evenodd"/></svg>
           </summary>
           <div class="space-y-3 px-4 pb-4">
-            <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="lbl" for="inputPaymentStatus">Status Pembayaran</label>
+              <select id="inputPaymentStatus" onchange="togglePaymentStatus()" class="field font-medium text-stone-800">
+                <option value="dp">DP (Uang Muka)</option>
+                <option value="lunas">LUNAS</option>
+              </select>
+            </div>
+
+            <div id="dpSection" class="grid grid-cols-2 gap-3">
               <div>
                 <label class="lbl" for="inputDpPercent">DP (%)</label>
                 <input type="number" inputmode="numeric" id="inputDpPercent" value="80" min="0" max="100" oninput="updatePreview()" class="field" />
@@ -163,10 +171,11 @@
                 <input type="text" id="inputDpLabel" value="Sisa Pelunasan" oninput="updatePreview()" class="field" />
               </div>
             </div>
+
             <div class="rounded-xl bg-accent-soft p-3.5 text-sm">
               <div class="flex justify-between py-0.5"><span class="text-stone-600">Grand total</span><span id="edTotal" class="font-semibold"></span></div>
-              <div class="flex justify-between py-0.5"><span id="edDpLabel" class="text-stone-600"></span><span id="edDp" class="font-semibold"></span></div>
-              <div class="mt-1 flex justify-between border-t border-accent/20 pt-1.5"><span id="edRemLabel" class="font-semibold text-accent"></span><span id="edRem" class="font-bold text-accent"></span></div>
+              <div id="edDpRow" class="flex justify-between py-0.5"><span id="edDpLabel" class="text-stone-600"></span><span id="edDp" class="font-semibold"></span></div>
+              <div id="edRemRow" class="mt-1 flex justify-between border-t border-accent/20 pt-1.5"><span id="edRemLabel" class="font-semibold text-accent"></span><span id="edRem" class="font-bold text-accent"></span></div>
             </div>
           </div>
         </details>
@@ -263,13 +272,17 @@ Biaya ongkir muncul setelah pencetakan AWB ( boleh menyusul )</textarea>
                       <span class="font-bold text-gray-700">Grand Total</span>
                       <span id="viewGrandTotal" class="font-bold text-gray-900"></span>
                     </div>
-                    <div class="flex justify-between border-b border-gray-100 py-1 text-gray-700">
+                    <div id="viewDpRow" class="flex justify-between border-b border-gray-100 py-1 text-gray-700">
                       <span id="viewDpLabel" class="font-medium"></span>
                       <span id="viewDpAmount" class="font-semibold"></span>
                     </div>
-                    <div class="flex justify-between rounded bg-[#8C7061]/10 px-2 py-1 font-bold text-gray-800">
+                    <div id="viewRemRow" class="flex justify-between rounded bg-[#8C7061]/10 px-2 py-1 font-bold text-gray-800">
                       <span id="viewRemainingLabel">Sisa Pelunasan</span>
                       <span id="viewRemaining" class="text-[#8C7061]"></span>
+                    </div>
+                    <!-- Badge Lunas -->
+                    <div id="viewLunasBadge" class="hidden text-center py-1 bg-emerald-100 text-emerald-800 border border-emerald-300 font-extrabold uppercase rounded tracking-wider">
+                      LUNAS
                     </div>
                   </div>
                 </div>
@@ -325,7 +338,7 @@ Biaya ongkir muncul setelah pencetakan AWB ( boleh menyusul )</textarea>
     const SYSTEM_PASSWORD = "ikmalsayang";
     const DRAFT_KEY = "ivy_invoice_draft_v1";
     const SESSION_KEY = "ivy_unlocked";
-    const FIELDS = ['inputDate','inputInvNo','inputClientName','inputClientAddress','inputClientPhone','inputDpPercent','inputDpLabel','inputNotes','inputBank','inputSigner','inputSigGap'];
+    const FIELDS = ['inputDate','inputInvNo','inputClientName','inputClientAddress','inputClientPhone','inputPaymentStatus','inputDpPercent','inputDpLabel','inputNotes','inputBank','inputSigner','inputSigGap'];
     const dayNames = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
     const $ = (id) => document.getElementById(id);
 
@@ -342,16 +355,11 @@ Biaya ongkir muncul setelah pencetakan AWB ( boleh menyusul )</textarea>
     /* ---------- Auth ---------- */
     function unlockApp(e) {
       e.preventDefault();
-      if ($('passwordInput').value === SYSTEM_PASSWORD) {
-        try { sessionStorage.setItem(SESSION_KEY, '1'); } catch (_) {}
-        openApp();
-      } else {
-        $('passwordError').classList.remove('hidden');
+      if ($('passwordInput').value === SYSTEM_PASSWORD) { try { sessionStorage.setItem(SESSION_KEY, '1'); } catch (_) {} openApp(); } else {$('passwordError').classList.remove('hidden');
       }
     }
     function openApp() {
-      $('passwordModal').classList.add('hidden');
-      $('mainApp').classList.remove('hidden');
+      $('passwordModal').classList.add('hidden');$('mainApp').classList.remove('hidden');
       initApp();
     }
 
@@ -362,11 +370,11 @@ Biaya ongkir muncul setelah pencetakan AWB ( boleh menyusul )</textarea>
     }
 
     function initApp() {
-      FIELDS.forEach(id => DEFAULTS[id] = $(id).value);
-      $('inputDate').value = todayStr();
+      FIELDS.forEach(id => DEFAULTS[id] = $(id).value);$('inputDate').value = todayStr();
       generateAutoInvNo(new Date());
       loadDraft();
       renderItems();
+      togglePaymentStatus();
       updatePreview();
       setTab('edit');
       new ResizeObserver(fitPreview).observe($('previewWrap'));
@@ -389,21 +397,20 @@ Biaya ongkir muncul setelah pencetakan AWB ( boleh menyusul )</textarea>
     }
     function resetAll() {
       if (!confirm('Mulai invoice baru? Semua isian akan dikembalikan ke awal.')) return;
-      FIELDS.forEach(id => $(id).value = DEFAULTS[id]);
-      $('inputDate').value = todayStr();
+      FIELDS.forEach(id => $(id).value = DEFAULTS[id]);$('inputDate').value = todayStr();
       generateAutoInvNo(new Date());
       items = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
-      renderItems(); updatePreview();
+      renderItems(); 
+      togglePaymentStatus();
+      updatePreview();
       toast('Invoice direset');
     }
 
     /* ---------- Tabs (mobile) ---------- */
     function setTab(tab) {
       const edit = tab === 'edit';
-      $('paneEdit').classList.toggle('hidden', !edit);
-      $('panePreview').classList.toggle('hidden', edit);
-      $('panePreview').classList.toggle('lg:block', true);
-      $('paneEdit').classList.toggle('lg:block', true);
+      $('paneEdit').classList.toggle('hidden', !edit);$('panePreview').classList.toggle('hidden', edit);
+      $('panePreview').classList.toggle('lg:block', true);$('paneEdit').classList.toggle('lg:block', true);
       const on = 'bg-white text-accent shadow-sm', off = 'text-stone-500';
       $('tabEdit').className = 'rounded-lg py-2.5 transition ' + (edit ? on : off);
       $('tabPreview').className = 'rounded-lg py-2.5 transition ' + (edit ? off : on);
@@ -413,7 +420,7 @@ Biaya ongkir muncul setelah pencetakan AWB ( boleh menyusul )</textarea>
 
     /* ---------- Skala pratinjau A4 agar muat di layar ---------- */
     function fitPreview() {
-      const wrap = $('previewWrap'), stage = $('previewStage'), canvas = $('invoiceCanvas');
+      const wrap = $('previewWrap'), stage = $('previewStage'), canvas =$('invoiceCanvas');
       const w = wrap.clientWidth;
       if (!w) return;
       const base = canvas.offsetWidth;
@@ -491,12 +498,23 @@ Biaya ongkir muncul setelah pencetakan AWB ( boleh menyusul )</textarea>
       updatePreview();
     }
 
+    /* ---------- Toggle Status Pembayaran ---------- */
+    function togglePaymentStatus() {
+      const status = $('inputPaymentStatus').value;
+      const isLunas = status === 'lunas';
+
+      $('dpSection').classList.toggle('hidden', isLunas);
+      $('edDpRow').classList.toggle('hidden', isLunas);$('edRemRow').classList.toggle('hidden', isLunas);
+
+      updatePreview();
+    }
+
     /* ---------- Pratinjau ---------- */
     function updatePreview() {
-      $('viewInvHeader').textContent = $('inputInvNo').value;
-      $('viewClientName').textContent = $('inputClientName').value;
-      $('viewClientAddress').textContent = $('inputClientAddress').value;
-      $('viewClientPhone').textContent = $('inputClientPhone').value;
+      $('viewInvHeader').textContent =$('inputInvNo').value;
+      $('viewClientName').textContent =$('inputClientName').value;
+      $('viewClientAddress').textContent =$('inputClientAddress').value;
+      $('viewClientPhone').textContent =$('inputClientPhone').value;
 
       const tbody = $('viewTableBody');
       tbody.innerHTML = '';
@@ -515,27 +533,34 @@ Biaya ongkir muncul setelah pencetakan AWB ( boleh menyusul )</textarea>
         tbody.appendChild(tr);
       });
 
+      const isLunas = $('inputPaymentStatus').value === 'lunas';
       const pct = Math.min(100, Math.max(0, parseFloat($('inputDpPercent').value) || 0));
       const dp = grand * pct / 100, rem = grand - dp;
       const remLabel = $('inputDpLabel').value || 'Sisa Pelunasan';
 
       $('viewGrandTotal').textContent = formatRupiah(grand);
-      $('viewDpLabel').textContent = `DP ${pct}%`;
-      $('viewDpAmount').textContent = formatRupiah(dp);
-      $('viewRemainingLabel').textContent = remLabel;
-      $('viewRemaining').textContent = formatRupiah(rem);
+      $('edTotal').textContent = formatRupiah(grand);$('barTotal').textContent = formatRupiah(grand);
 
-      $('edTotal').textContent = formatRupiah(grand);
-      $('edDpLabel').textContent = `DP ${pct}%`;
-      $('edDp').textContent = formatRupiah(dp);
-      $('edRemLabel').textContent = remLabel;
-      $('edRem').textContent = formatRupiah(rem);
-      $('barTotal').textContent = formatRupiah(grand);
+      // Tampilan DP vs Lunas pada Canvas Invoice
+      if (isLunas) {
+        $('viewDpRow').classList.add('hidden');
+        $('viewRemRow').classList.add('hidden');$('viewLunasBadge').classList.remove('hidden');
+      } else {
+        $('viewDpRow').classList.remove('hidden');
+        $('viewRemRow').classList.remove('hidden');$('viewLunasBadge').classList.add('hidden');
+
+        $('viewDpLabel').textContent = `DP ${pct}%`;
+        $('viewDpAmount').textContent = formatRupiah(dp);$('viewRemainingLabel').textContent = remLabel;
+        $('viewRemaining').textContent = formatRupiah(rem);
+
+        $('edDpLabel').textContent = `DP ${pct}%`;
+        $('edDp').textContent = formatRupiah(dp);$('edRemLabel').textContent = remLabel;
+        $('edRem').textContent = formatRupiah(rem);
+      }
 
       // Catatan: tiap baris otomatis jadi poin
-      const lines = $('inputNotes').value.split('\n').map(l => l.replace(/^\s*[•\-–*]\s*/, '').trim()).filter(Boolean);
-      $('viewNotes').innerHTML = lines.map(l => `<div class="flex gap-1.5"><span>•</span><span>${esc(l)}</span></div>`).join('');
-      $('viewBank').textContent = $('inputBank').value;
+      const lines = $('inputNotes').value.split('\n').map(l => l.replace(/^\s*[•\-–*]\s*/, '').trim()).filter(Boolean);$('viewNotes').innerHTML = lines.map(l => `<div class="flex gap-1.5"><span>•</span><span>${esc(l)}</span></div>`).join('');
+      $('viewBank').textContent =$('inputBank').value;
 
       const signer = $('inputSigner').value;
       $('viewSignerName').textContent = signer;
