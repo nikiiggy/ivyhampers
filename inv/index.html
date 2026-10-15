@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#8C7061" />
+  <title>Ivyhampers.id - Invoice Generator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { theme: { extend: { colors: { accent: { DEFAULT: '#8C7061', dark: '#775e51', soft: '#f4eeea' } } } } };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <style type="text/tailwindcss">
+    @layer components {
+      .field { @apply w-full rounded-xl border border-stone-300 bg-white px-3.5 py-3 text-base text-stone-800 outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20; }
+      .lbl { @apply mb-1.5 block text-sm font-medium text-stone-600; }
+      .btn-primary { @apply inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-5 py-3 text-base font-semibold text-white shadow-sm transition active:scale-[.98] hover:bg-accent-dark disabled:opacity-60; }
+    }
+  </style>
+
+  <style>
+    html { -webkit-text-size-adjust: 100%; }
+    body { font-family: 'Inter', sans-serif; background: #f5f3f1; -webkit-tap-highlight-color: transparent; }
+    .font-signature { font-family: 'Dancing Script', cursive; }
+
+    /* Accordion */
+    details.sec > summary { list-style: none; cursor: pointer; }
+    details.sec > summary::-webkit-details-marker { display: none; }
+    details.sec > summary .chev { transition: transform .2s; }
+    details.sec[open] > summary .chev { transform: rotate(180deg); }
+
+    /* Kertas A4 */
+    .a4-page {
+      width: 210mm; min-height: 297mm; box-sizing: border-box; position: relative;
+      background-color: #fff;
+      background-image: url('https://i.ibb.co.com/NnyzG8Xt/SURAT-01.jpg');
+      background-size: 100% 100%; background-repeat: no-repeat; background-position: center;
+      padding: 53mm 13mm 13mm 13mm; /* atas 53mm, sisi/bawah 13mm */
+      transform-origin: top left;
+    }
+
+    .safe-bottom { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + .75rem); }
+
+    @media print {
+      body { background: none !important; }
+      .no-print { display: none !important; }
+      .a4-page { transform: none !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body class="text-stone-800">
+
+  <!-- Lock screen -->
+  <div id="passwordModal" class="fixed inset-0 z-50 flex items-end justify-center bg-stone-900/80 backdrop-blur-sm sm:items-center sm:p-4">
+    <div class="w-full max-w-md rounded-t-3xl bg-white p-6 text-center shadow-2xl sm:rounded-3xl safe-bottom">
+      <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-accent-soft text-accent">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+      </div>
+      <h2 class="text-xl font-bold">Masuk ke Invoice Generator</h2>
+      <p class="mb-5 mt-1 text-sm text-stone-500">Khusus internal Ivyhampers.id</p>
+      <form onsubmit="unlockApp(event)">
+        <input type="password" id="passwordInput" placeholder="Password" autocomplete="current-password" class="field text-center text-lg tracking-widest" required />
+        <p id="passwordError" class="mt-2 hidden text-sm text-red-600">Password salah. Coba lagi.</p>
+        <button type="submit" class="btn-primary mt-4 w-full">Buka aplikasi</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="mainApp" class="hidden min-h-screen pb-28 lg:pb-10">
+
+    <!-- Header -->
+    <header class="no-print sticky top-0 z-30 border-b border-stone-200 bg-white/90 backdrop-blur">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3">
+        <div class="flex items-center gap-2.5">
+          <span class="h-3 w-3 rounded-full bg-accent"></span>
+          <h1 class="text-base font-bold sm:text-lg">Invoice Ivyhampers.id</h1>
+        </div>
+        <button onclick="downloadPDF()" class="btn-primary hidden !py-2.5 text-sm lg:inline-flex" data-pdf-btn>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          <span>Download PDF</span>
+        </button>
+      </div>
+      <!-- Tab (hanya mobile/tablet) -->
+      <div class="mx-auto max-w-7xl px-4 pb-3 lg:hidden">
+        <div class="grid grid-cols-2 rounded-xl bg-stone-100 p-1 text-sm font-semibold">
+          <button id="tabEdit" onclick="setTab('edit')" class="rounded-lg py-2.5 transition">Isi data</button>
+          <button id="tabPreview" onclick="setTab('preview')" class="rounded-lg py-2.5 transition">Pratinjau</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="mx-auto grid max-w-7xl grid-cols-1 gap-6 px-4 pt-4 lg:grid-cols-12 lg:pt-6">
+
+      <!-- EDITOR -->
+      <section id="paneEdit" class="no-print space-y-3 lg:col-span-5">
+
+        <details class="sec rounded-2xl border border-stone-200 bg-white" open>
+          <summary class="flex items-center justify-between px-4 py-4">
+            <span class="font-semibold">Info invoice</span>
+            <svg class="chev h-5 w-5 text-stone-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.3 7.3a1 1 0 011.4 0L10 10.6l3.3-3.3a1 1 0 111.4 1.4l-4 4a1 1 0 01-1.4 0l-4-4a1 1 0 010-1.4z" clip-rule="evenodd"/></svg>
+          </summary>
+          <div class="space-y-3 px-4 pb-4">
+            <div>
+              <label class="lbl" for="inputDate">Tanggal</label>
+              <input type="date" id="inputDate" onchange="handleDateChange()" class="field" />
+            </div>
+            <div>
+              <label class="lbl" for="inputInvNo">Nomor invoice</label>
+              <input type="text" id="inputInvNo" oninput="updatePreview()" class="field" />
+            </div>
+          </div>
+        </details>
+
+        <details class="sec rounded-2xl border border-stone-200 bg-white" open>
+          <summary class="flex items-center justify-between px-4 py-4">
+            <span class="font-semibold">Penerima</span>
+            <svg class="chev h-5 w-5 text-stone-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.3 7.3a1 1 0 011.4 0L10 10.6l3.3-3.3a1 1 0 111.4 1.4l-4 4a1 1 0 01-1.4 0l-4-4a1 1 0 010-1.4z" clip-rule="evenodd"/></svg>
+          </summary>
+          <div class="space-y-3 px-4 pb-4">
+            <div>
+              <label class="lbl" for="inputClientName">Nama klien</label>
+              <input type="text" id="inputClientName" value="Sarah Insani Salim" autocomplete="off" oninput="updatePreview()" class="field" />
+            </div>
+            <div>
+              <label class="lbl" for="inputClientAddress">Alamat</label>
+              <textarea id="inputClientAddress" rows="2" oninput="updatePreview()" class="field">Surabaya, Jawa Timur</textarea>
+            </div>
+            <div>
+              <label class="lbl" for="inputClientPhone">No. HP / WhatsApp</label>
+              <input type="tel" inputmode="tel" id="inputClientPhone" value="087863426500" oninput="updatePreview()" class="field" />
+            </div>
+          </div>
+        </details>
+
+        <details class="sec rounded-2xl border border-stone-200 bg-white" open>
+          <summary class="flex items-center justify-between px-4 py-4">
+            <span class="font-semibold">Item <span id="itemCount" class="ml-1 rounded-full bg-accent-soft px-2 py-0.5 text-xs font-semibold text-accent">1</span></span>
+            <svg class="chev h-5 w-5 text-stone-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.3 7.3a1 1 0 011.4 0L10 10.6l3.3-3.3a1 1 0 111.4 1.4l-4 4a1 1 0 01-1.4 0l-4-4a1 1 0 010-1.4z" clip-rule="evenodd"/></svg>
+          </summary>
+          <div class="space-y-3 px-4 pb-4">
+            <div id="itemsContainer" class="space-y-3"></div>
+            <button onclick="addItem()" class="w-full rounded-xl border-2 border-dashed border-accent/40 py-3 text-sm font-semibold text-accent transition active:bg-accent-soft">+ Tambah item</button>
+          </div>
+        </details>
+
+        <details class="sec rounded-2xl border border-stone-200 bg-white">
+          <summary class="flex items-center justify-between px-4 py-4">
+            <span class="font-semibold">Pembayaran &amp; DP</span>
+            <svg class="chev h-5 w-5 text-stone-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.3 7.3a1 1 0 011.4 0L10 10.6l3.3-3.3a1 1 0 111.4 1.4l-4 4a1 1 0 01-1.4 0l-4-4a1 1 0 010-1.4z" clip-rule="evenodd"/></svg>
+          </summary>
+          <div class="space-y-3 px-4 pb-4">
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="lbl" for="inputDpPercent">DP (%)</label>
+                <input type="number" inputmode="numeric" id="inputDpPercent" value="80" min="0" max="100" oninput="updatePreview()" class="field" />
+              </div>
+              <div>
+                <label class="lbl" for="inputDpLabel">Label sisa</label>
+                <input type="text" id="inputDpLabel" value="Sisa Pelunasan" oninput="updatePreview()" class="field" />
+              </div>
+            </div>
+            <div class="rounded-xl bg-accent-soft p-3.5 text-sm">
+              <div class="flex justify-between py-0.5"><span class="text-stone-600">Grand total</span><span id="edTotal" class="font-semibold"></span></div>
+              <div class="flex justify-between py-0.5"><span id="edDpLabel" class="text-stone-600"></span><span id="edDp" class="font-semibold"></span></div>
+              <div class="mt-1 flex justify-between border-t border-accent/20 pt-1.5"><span id="edRemLabel" class="font-semibold text-accent"></span><span id="edRem" class="font-bold text-accent"></span></div>
+            </div>
+          </div>
+        </details>
+
+        <details class="sec rounded-2xl border border-stone-200 bg-white">
+          <summary class="flex items-center justify-between px-4 py-4">
+            <span class="font-semibold">Keterangan &amp; rekening</span>
+            <svg class="chev h-5 w-5 text-stone-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.3 7.3a1 1 0 011.4 0L10 10.6l3.3-3.3a1 1 0 111.4 1.4l-4 4a1 1 0 01-1.4 0l-4-4a1 1 0 010-1.4z" clip-rule="evenodd"/></svg>
+          </summary>
+          <div class="space-y-3 px-4 pb-4">
+            <div>
+              <label class="lbl" for="inputNotes">Catatan (satu baris = satu poin)</label>
+              <textarea id="inputNotes" rows="5" oninput="updatePreview()" class="field !text-sm">DP transaksi custom minimal 80%
+Pelunasan maksimal H-1 sebelum pengiriman
+Harga diatas belum termasuk Ongkir
+Biaya ongkir muncul setelah pencetakan AWB ( boleh menyusul )</textarea>
+            </div>
+            <div>
+              <label class="lbl" for="inputBank">Info rekening</label>
+              <input type="text" id="inputBank" value="Bank BCA 0181030231 a/n Dhika Putri Awwallin" oninput="updatePreview()" class="field !text-sm" />
+            </div>
+          </div>
+        </details>
+
+        <details class="sec rounded-2xl border border-stone-200 bg-white">
+          <summary class="flex items-center justify-between px-4 py-4">
+            <span class="font-semibold">Tanda tangan</span>
+            <svg class="chev h-5 w-5 text-stone-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.3 7.3a1 1 0 011.4 0L10 10.6l3.3-3.3a1 1 0 111.4 1.4l-4 4a1 1 0 01-1.4 0l-4-4a1 1 0 010-1.4z" clip-rule="evenodd"/></svg>
+          </summary>
+          <div class="space-y-3 px-4 pb-4">
+            <div>
+              <label class="lbl" for="inputSigner">Nama penandatangan</label>
+              <input type="text" id="inputSigner" value="Dhika Putri" oninput="updatePreview()" class="field" />
+            </div>
+            <div>
+              <label class="lbl" for="inputSigGap">Jarak dari catatan: <span id="sigGapVal" class="font-semibold text-accent">28</span> px</label>
+              <input type="range" id="inputSigGap" min="0" max="160" step="4" value="28" oninput="updatePreview()" class="w-full accent-[#8C7061]" />
+              <p class="mt-1 text-xs text-stone-500">Geser ke kiri untuk menaikkan tanda tangan, ke kanan untuk menurunkan.</p>
+            </div>
+          </div>
+        </details>
+
+        <button onclick="resetAll()" class="w-full rounded-xl py-3 text-sm font-medium text-stone-500 transition active:bg-stone-200">Mulai invoice baru</button>
+      </section>
+
+      <!-- PRATINJAU -->
+      <section id="panePreview" class="hidden lg:col-span-7 lg:block">
+        <div class="no-print mb-3 flex items-center justify-between text-sm text-stone-500">
+          <span>Pratinjau ukuran A4</span>
+          <span id="scaleInfo"></span>
+        </div>
+        <div id="previewWrap" class="w-full">
+          <div id="previewStage" class="mx-auto overflow-hidden rounded-lg shadow-lg ring-1 ring-black/5">
+
+            <div id="invoiceCanvas" class="a4-page text-sm leading-relaxed text-stone-800">
+
+              <div class="mb-6 border-b border-gray-200 pb-2 text-center">
+                <h1 class="mb-1 text-3xl font-extrabold tracking-wider text-[#8C7061]">INVOICE</h1>
+                <p id="viewInvHeader" class="text-xs font-semibold text-gray-600"></p>
+              </div>
+
+              <div class="mb-6 grid grid-cols-2 gap-4 text-xs">
+                <div>
+                  <p class="mb-1 font-bold text-[#8C7061]">Kepada Yth.</p>
+                  <p id="viewClientName" class="text-sm font-semibold text-gray-800"></p>
+                  <p id="viewClientAddress" class="mt-0.5 whitespace-pre-line text-gray-600"></p>
+                  <p id="viewClientPhone" class="mt-0.5 text-gray-600"></p>
+                </div>
+                <div class="text-right">
+                  <p class="text-sm font-bold text-[#8C7061]">Ivyhampers.id</p>
+                  <p class="mt-0.5 text-gray-600">Perumahan Magersari, Kab. Sidoarjo</p>
+                  <p class="text-gray-600">Jawa Timur, Indonesia.</p>
+                  <p class="mt-0.5 text-gray-600">0851 1707 6637</p>
+                </div>
+              </div>
+
+              <div class="mb-6 w-full">
+                <table class="w-full border-collapse text-left text-xs">
+                  <thead>
+                    <tr class="bg-[#8C7061] text-white">
+                      <th class="w-10 rounded-tl-md px-2 py-2 text-center">No</th>
+                      <th class="px-3 py-2">Deskripsi</th>
+                      <th class="w-16 px-2 py-2 text-center">Qty</th>
+                      <th class="w-24 px-3 py-2 text-right">Satuan</th>
+                      <th class="w-28 rounded-tr-md px-3 py-2 text-right">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody id="viewTableBody" class="divide-y divide-gray-200 border-b border-gray-200"></tbody>
+                </table>
+
+                <div class="mt-3 flex justify-end text-xs">
+                  <div class="w-64 space-y-1.5">
+                    <div class="flex justify-between border-b border-gray-100 py-1">
+                      <span class="font-bold text-gray-700">Grand Total</span>
+                      <span id="viewGrandTotal" class="font-bold text-gray-900"></span>
+                    </div>
+                    <div class="flex justify-between border-b border-gray-100 py-1 text-gray-700">
+                      <span id="viewDpLabel" class="font-medium"></span>
+                      <span id="viewDpAmount" class="font-semibold"></span>
+                    </div>
+                    <div class="flex justify-between rounded bg-[#8C7061]/10 px-2 py-1 font-bold text-gray-800">
+                      <span id="viewRemainingLabel">Sisa Pelunasan</span>
+                      <span id="viewRemaining" class="text-[#8C7061]"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="space-y-3 rounded-lg border border-gray-100 bg-gray-50/60 p-3 text-xs text-gray-700">
+                <div>
+                  <p class="mb-1 font-bold text-[#8C7061]">Keterangan:</p>
+                  <div id="viewNotes" class="space-y-0.5 leading-relaxed text-gray-600"></div>
+                </div>
+                <div class="border-t border-gray-200 pt-2">
+                  <p class="font-semibold text-gray-800">
+                    <span class="font-bold text-[#8C7061]">Note:</span> Pembayaran Melalui <span id="viewBank" class="font-bold text-gray-900"></span>
+                  </p>
+                </div>
+              </div>
+
+              <!-- Tanda tangan: langsung mengikuti konten, jaraknya bisa diatur -->
+              <div id="viewSignatureWrap" class="flex justify-end text-center" style="margin-top:28px; page-break-inside:avoid;">
+                <div class="w-48">
+                  <p class="mb-1 text-xs text-gray-600">Hormat Kami,</p>
+                  <div class="flex h-16 items-center justify-center">
+                    <span id="viewSignatureFont" class="font-signature -rotate-3 select-none text-3xl text-gray-900"></span>
+                  </div>
+                  <p id="viewSignerName" class="mt-1 border-t border-gray-400 pt-1 text-xs font-bold text-gray-800"></p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Bar bawah (mobile) -->
+    <div class="no-print fixed inset-x-0 bottom-0 z-30 border-t border-stone-200 bg-white/95 px-4 pt-3 backdrop-blur safe-bottom lg:hidden">
+      <div class="mx-auto flex max-w-xl items-center gap-3">
+        <div class="min-w-0 flex-1">
+          <p class="text-xs text-stone-500">Grand total</p>
+          <p id="barTotal" class="truncate text-lg font-bold text-stone-800"></p>
+        </div>
+        <button onclick="downloadPDF()" class="btn-primary" data-pdf-btn>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          <span>PDF</span>
+        </button>
+      </div>
+    </div>
+
+    <div id="toast" class="no-print pointer-events-none fixed inset-x-0 bottom-24 z-40 mx-auto hidden w-fit max-w-[90%] rounded-full bg-stone-900 px-4 py-2 text-sm text-white shadow-lg lg:bottom-6"></div>
+  </div>
+
+  <script>
+    const SYSTEM_PASSWORD = "ikmalsayang";
+    const DRAFT_KEY = "ivy_invoice_draft_v1";
+    const SESSION_KEY = "ivy_unlocked";
+    const FIELDS = ['inputDate','inputInvNo','inputClientName','inputClientAddress','inputClientPhone','inputDpPercent','inputDpLabel','inputNotes','inputBank','inputSigner','inputSigGap'];
+    const dayNames = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
+    const $ = (id) => document.getElementById(id);
+
+    const DEFAULT_ITEMS = [{
+      description: "Hampers Jameela Custom\nTema : pink matcha\nIsi : mukenah, tasbih digital, dzikir book pagi petang, greeting card, hangtag decorative dan ornament hampers lebaran",
+      qty: 17, unit: "Pcs", price: 100000
+    }];
+    let items = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
+    let DEFAULTS = {};
+
+    const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const formatRupiah = (n) => 'Rp ' + (Number(n) || 0).toLocaleString('id-ID');
+
+    /* ---------- Auth ---------- */
+    function unlockApp(e) {
+      e.preventDefault();
+      if ($('passwordInput').value === SYSTEM_PASSWORD) {
+        try { sessionStorage.setItem(SESSION_KEY, '1'); } catch (_) {}
+        openApp();
+      } else {
+        $('passwordError').classList.remove('hidden');
+      }
+    }
+    function openApp() {
+      $('passwordModal').classList.add('hidden');
+      $('mainApp').classList.remove('hidden');
+      initApp();
+    }
+
+    /* ---------- Init ---------- */
+    function todayStr() {
+      const t = new Date();
+      return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
+    }
+
+    function initApp() {
+      FIELDS.forEach(id => DEFAULTS[id] = $(id).value);
+      $('inputDate').value = todayStr();
+      generateAutoInvNo(new Date());
+      loadDraft();
+      renderItems();
+      updatePreview();
+      setTab('edit');
+      new ResizeObserver(fitPreview).observe($('previewWrap'));
+      window.addEventListener('resize', fitPreview);
+    }
+
+    function saveDraft() {
+      try {
+        const f = {}; FIELDS.forEach(id => f[id] = $(id).value);
+        localStorage.setItem(DRAFT_KEY, JSON.stringify({ f, items }));
+      } catch (_) {}
+    }
+    function loadDraft() {
+      try {
+        const d = JSON.parse(localStorage.getItem(DRAFT_KEY));
+        if (!d) return;
+        FIELDS.forEach(id => { if (d.f && d.f[id] !== undefined) $(id).value = d.f[id]; });
+        if (Array.isArray(d.items) && d.items.length) items = d.items;
+      } catch (_) {}
+    }
+    function resetAll() {
+      if (!confirm('Mulai invoice baru? Semua isian akan dikembalikan ke awal.')) return;
+      FIELDS.forEach(id => $(id).value = DEFAULTS[id]);
+      $('inputDate').value = todayStr();
+      generateAutoInvNo(new Date());
+      items = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
+      renderItems(); updatePreview();
+      toast('Invoice direset');
+    }
+
+    /* ---------- Tabs (mobile) ---------- */
+    function setTab(tab) {
+      const edit = tab === 'edit';
+      $('paneEdit').classList.toggle('hidden', !edit);
+      $('panePreview').classList.toggle('hidden', edit);
+      $('panePreview').classList.toggle('lg:block', true);
+      $('paneEdit').classList.toggle('lg:block', true);
+      const on = 'bg-white text-accent shadow-sm', off = 'text-stone-500';
+      $('tabEdit').className = 'rounded-lg py-2.5 transition ' + (edit ? on : off);
+      $('tabPreview').className = 'rounded-lg py-2.5 transition ' + (edit ? off : on);
+      window.scrollTo({ top: 0 });
+      requestAnimationFrame(fitPreview);
+    }
+
+    /* ---------- Skala pratinjau A4 agar muat di layar ---------- */
+    function fitPreview() {
+      const wrap = $('previewWrap'), stage = $('previewStage'), canvas = $('invoiceCanvas');
+      const w = wrap.clientWidth;
+      if (!w) return;
+      const base = canvas.offsetWidth;
+      const s = Math.min(1, w / base);
+      canvas.style.transform = `scale(${s})`;
+      stage.style.width = (base * s) + 'px';
+      stage.style.height = (canvas.offsetHeight * s) + 'px';
+      $('scaleInfo').textContent = s < 1 ? Math.round(s * 100) + '%' : '';
+    }
+
+    /* ---------- Nomor invoice ---------- */
+    function handleDateChange() {
+      const v = $('inputDate').value;
+      if (!v) return;
+      generateAutoInvNo(new Date(v + 'T00:00:00'));
+      updatePreview();
+    }
+    function generateAutoInvNo(d) {
+      const day = String(d.getDate()).padStart(2,'0'), month = String(d.getMonth()+1).padStart(2,'0');
+      $('inputInvNo').value = `${day}/${month}/${d.getFullYear()}/010/001 – ${dayNames[d.getDay()]}, ${day}/${month}/${d.getFullYear()}`;
+    }
+
+    /* ---------- Item ---------- */
+    function renderItems() {
+      const box = $('itemsContainer');
+      box.innerHTML = '';
+      items.forEach((it, idx) => {
+        const div = document.createElement('div');
+        div.className = 'space-y-3 rounded-xl border border-stone-200 bg-stone-50 p-3';
+        div.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-semibold text-stone-500">Item ${idx + 1}</span>
+            ${items.length > 1 ? `<button onclick="removeItem(${idx})" class="rounded-lg px-2.5 py-1 text-sm font-medium text-red-600 active:bg-red-50">Hapus</button>` : ''}
+          </div>
+          <div>
+            <label class="lbl">Deskripsi</label>
+            <textarea rows="3" oninput="updateItem(${idx},'description',this.value)" class="field !text-sm">${esc(it.description)}</textarea>
+          </div>
+          <div class="grid grid-cols-5 gap-2">
+            <div class="col-span-2">
+              <label class="lbl">Qty</label>
+              <input type="number" inputmode="decimal" value="${esc(it.qty)}" oninput="updateItem(${idx},'qty',parseFloat(this.value)||0)" class="field" />
+            </div>
+            <div class="col-span-3">
+              <label class="lbl">Satuan</label>
+              <input type="text" value="${esc(it.unit)}" oninput="updateItem(${idx},'unit',this.value)" class="field" />
+            </div>
+          </div>
+          <div>
+            <label class="lbl">Harga satuan (Rp)</label>
+            <input type="number" inputmode="numeric" value="${esc(it.price)}" oninput="updateItem(${idx},'price',parseFloat(this.value)||0)" class="field" />
+          </div>
+          <div class="flex justify-between border-t border-stone-200 pt-2 text-sm">
+            <span class="text-stone-500">Subtotal</span>
+            <span id="sub-${idx}" class="font-semibold">${formatRupiah(it.qty * it.price)}</span>
+          </div>`;
+        box.appendChild(div);
+      });
+      $('itemCount').textContent = items.length;
+    }
+    function addItem() {
+      items.push({ description: "", qty: 1, unit: "Pcs", price: 0 });
+      renderItems(); updatePreview();
+      const last = $('itemsContainer').lastElementChild;
+      last && last.querySelector('textarea').focus();
+    }
+    function removeItem(idx) {
+      items.splice(idx, 1);
+      renderItems(); updatePreview();
+    }
+    function updateItem(idx, field, value) {
+      items[idx][field] = value;
+      const sub = $('sub-' + idx);
+      if (sub) sub.textContent = formatRupiah(items[idx].qty * items[idx].price);
+      updatePreview();
+    }
+
+    /* ---------- Pratinjau ---------- */
+    function updatePreview() {
+      $('viewInvHeader').textContent = $('inputInvNo').value;
+      $('viewClientName').textContent = $('inputClientName').value;
+      $('viewClientAddress').textContent = $('inputClientAddress').value;
+      $('viewClientPhone').textContent = $('inputClientPhone').value;
+
+      const tbody = $('viewTableBody');
+      tbody.innerHTML = '';
+      let grand = 0;
+      items.forEach((it, i) => {
+        const total = it.qty * it.price;
+        grand += total;
+        const tr = document.createElement('tr');
+        tr.className = 'align-top';
+        tr.innerHTML = `
+          <td class="px-2 py-2.5 text-center font-medium">${i + 1}</td>
+          <td class="whitespace-pre-line px-3 py-2.5">${esc(it.description)}</td>
+          <td class="px-2 py-2.5 text-center">${esc(it.qty)} ${esc(it.unit)}</td>
+          <td class="px-3 py-2.5 text-right">${formatRupiah(it.price)}</td>
+          <td class="px-3 py-2.5 text-right font-medium">${formatRupiah(total)}</td>`;
+        tbody.appendChild(tr);
+      });
+
+      const pct = Math.min(100, Math.max(0, parseFloat($('inputDpPercent').value) || 0));
+      const dp = grand * pct / 100, rem = grand - dp;
+      const remLabel = $('inputDpLabel').value || 'Sisa Pelunasan';
+
+      $('viewGrandTotal').textContent = formatRupiah(grand);
+      $('viewDpLabel').textContent = `DP ${pct}%`;
+      $('viewDpAmount').textContent = formatRupiah(dp);
+      $('viewRemainingLabel').textContent = remLabel;
+      $('viewRemaining').textContent = formatRupiah(rem);
+
+      $('edTotal').textContent = formatRupiah(grand);
+      $('edDpLabel').textContent = `DP ${pct}%`;
+      $('edDp').textContent = formatRupiah(dp);
+      $('edRemLabel').textContent = remLabel;
+      $('edRem').textContent = formatRupiah(rem);
+      $('barTotal').textContent = formatRupiah(grand);
+
+      // Catatan: tiap baris otomatis jadi poin
+      const lines = $('inputNotes').value.split('\n').map(l => l.replace(/^\s*[•\-–*]\s*/, '').trim()).filter(Boolean);
+      $('viewNotes').innerHTML = lines.map(l => `<div class="flex gap-1.5"><span>•</span><span>${esc(l)}</span></div>`).join('');
+      $('viewBank').textContent = $('inputBank').value;
+
+      const signer = $('inputSigner').value;
+      $('viewSignerName').textContent = signer;
+      $('viewSignatureFont').textContent = signer;
+
+      const gap = $('inputSigGap').value;
+      $('sigGapVal').textContent = gap;
+      $('viewSignatureWrap').style.marginTop = gap + 'px';
+
+      saveDraft();
+      fitPreview();
+    }
+
+    /* ---------- PDF ---------- */
+    function toast(msg) {
+      const t = $('toast');
+      t.textContent = msg; t.classList.remove('hidden');
+      clearTimeout(toast._t);
+      toast._t = setTimeout(() => t.classList.add('hidden'), 2200);
+    }
+
+    function downloadPDF() {
+      const btns = document.querySelectorAll('[data-pdf-btn]');
+      const setBusy = (b) => btns.forEach(x => { x.disabled = b; x.querySelector('span').textContent = b ? 'Memproses…' : (x.classList.contains('lg:inline-flex') ? 'Download PDF' : 'PDF'); });
+      setBusy(true);
+
+      // Render dari salinan ukuran penuh (tidak terkena skala pratinjau)
+      const clone = $('invoiceCanvas').cloneNode(true);
+      clone.removeAttribute('id');
+      clone.style.transform = 'none';
+      clone.style.margin = '0';
+      clone.style.minHeight = '296.5mm';
+      const holder = document.createElement('div');
+      holder.style.cssText = 'position:absolute;left:-10000px;top:0;width:210mm;';
+      holder.appendChild(clone);
+      document.body.appendChild(holder);
+
+      const name = ($('inputClientName').value || 'Customer').replace(/[^\w\-\s]/g, '').trim().replace(/\s+/g, '_');
+      const opt = {
+        margin: 0,
+        filename: `Invoice_Ivyhampers_${name}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, logging: false, scrollX: 0, scrollY: 0 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+      const done = () => { holder.remove(); setBusy(false); };
+      html2pdf().set(opt).from(clone).save().then(() => { done(); toast('PDF tersimpan'); }).catch(() => { done(); toast('Gagal membuat PDF, coba lagi'); });
+    }
+
+    /* ---------- Start ---------- */
+    window.addEventListener('DOMContentLoaded', () => {
+      let ok = false;
+      try { ok = sessionStorage.getItem(SESSION_KEY) === '1'; } catch (_) {}
+      if (ok) openApp(); else $('passwordInput').focus();
+    });
+  </script>
+</body>
+</html>
