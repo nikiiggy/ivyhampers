@@ -10,7 +10,7 @@
     <meta name="keywords" content="hampers sidoarjo, hampers surabaya, gift box sidoarjo, hampers duka cita, hampers wedding, corporate gift">
 
     <!-- Favicon Inisial Gold Ivyhampers (IH) -->
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23C5A059'/><text x='50%' y='65%' font-family='Georgia, serif' font-size='50' font-weight='bold' fill='%23FFFFFF' text-anchor='middle'>IH</text></svg>">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23C5A059'/><text x='50%' y='65%' font-family='Georgia, serif' font-size='50' font-weight='bold' fill='%23FFFFFF' text-anchor='middle'>IH</text></svg>">
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -75,7 +75,7 @@
             color: inherit;
         }
 
-        /* Header Minimalis (Tanpa Menu Navigasi Bawah) */
+        /* Header Minimalis */
         header {
             background-color: var(--card-cream);
             position: sticky;
@@ -227,168 +227,86 @@
             padding-bottom: 4px;
         }
 
-        /* List Tombol PDF Pricelist + Foto 1:1 */
-        .pdf-list {
-            display: flex;
-            flex-direction: column;
+        /* --- GRID GALLERY PRICELIST 1080x1920 (TEKS DI LUAR GAMBAR) --- */
+        .pricelist-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
             gap: 12px;
             margin-bottom: 20px;
         }
 
-        .pdf-item-btn {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background-color: var(--bg-cream);
-            padding: 10px 14px 10px 10px;
+        .pricelist-card {
             border-radius: 10px;
+            overflow: hidden;
             border: 1px solid var(--border-color);
+            background-color: var(--bg-cream);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.06);
             transition: var(--transition);
         }
 
-        .pdf-item-btn:hover {
+        .pricelist-card:hover {
             border-color: var(--accent-gold);
-            background-color: #FFF;
         }
 
-        /* Thumb Foto Produk 1:1 */
-        .pdf-thumb-1x1 {
-            width: 58px;
-            height: 58px;
-            min-width: 58px;
-            border-radius: 8px;
+        /* Box Gambar Khusus Portrait 9:16 (1080x1920px) */
+        .pricelist-img-box {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 9 / 16;
             overflow: hidden;
             background-color: #E8E2D9;
         }
 
-        .pdf-thumb-1x1 img {
+        .pricelist-img-box img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            transition: transform 0.4s ease;
         }
 
-        .pdf-text-box {
-            flex-grow: 1;
+        .pricelist-card:hover .pricelist-img-box img {
+            transform: scale(1.05);
+        }
+
+        /* Box Konten di Bawah Gambar (Masih dalam 1 Kotak Card) */
+        .pricelist-info {
+            padding: 10px;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-        }
-
-        .pdf-title-text {
-            font-size: 0.88rem;
-            font-weight: 600;
-            color: var(--text-dark);
-            line-height: 1.3;
-        }
-
-        .pdf-sub-text {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-top: 2px;
-        }
-
-        .pdf-badge {
-            background-color: var(--accent-gold);
-            color: #FFF;
-            font-size: 10px;
-            font-weight: 600;
-            padding: 4px 8px;
-            border-radius: 4px;
-        }
-
-        /* Testimoni Section (Foto Kanan Mentok 1080x1440px Portrait) */
-        .testi-list {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
-
-        .testi-card {
+            gap: 8px;
             background-color: var(--bg-cream);
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
-            overflow: hidden;
-            display: flex;
-            justify-content: space-between;
-            align-items: stretch;
-        }
-
-        .testi-body {
-            padding: 14px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
+            flex-grow: 1;
             justify-content: space-between;
         }
 
-        .testi-stars {
-            color: var(--accent-gold);
-            font-size: 11px;
-            margin-bottom: 4px;
-        }
-
-        .testi-bought-tag {
-            font-size: 0.72rem;
-            font-weight: 600;
-            color: var(--accent-sage);
-            text-transform: uppercase;
-            margin-bottom: 6px;
-        }
-
-        .testi-text {
-            font-size: 0.82rem;
+        .pricelist-title {
             color: var(--text-dark);
-            font-style: italic;
-            margin-bottom: 8px;
-            line-height: 1.4;
+            font-size: 0.8rem;
+            font-weight: 600;
+            line-height: 1.25;
+            text-align: center;
         }
 
-        .testi-user {
+        .pricelist-download-btn {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            font-size: 0.76rem;
-            color: var(--text-muted);
-            border-top: 1px dashed var(--border-color);
-            padding-top: 6px;
-            margin-top: 4px;
-        }
-
-        .testi-user span {
+            justify-content: center;
+            gap: 5px;
+            background-color: var(--accent-gold);
+            color: #FFFFFF;
+            font-size: 0.7rem;
             font-weight: 600;
-            color: var(--text-dark);
+            padding: 7px 10px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            transition: var(--transition);
         }
 
-        .testi-prod-img-right {
-            width: 100px;
-            min-width: 100px;
-            background-color: #E8E2D9;
-        }
-
-        .testi-prod-img-right img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        /* About Us Content */
-        .about-box p {
-            font-size: 13px;
-            color: var(--text-muted);
-            margin-bottom: 12px;
-            text-align: justify;
-        }
-
-        .about-box ul {
-            font-size: 13px;
-            color: var(--text-muted);
-            padding-left: 18px;
-            margin-bottom: 15px;
-        }
-
-        .about-box li {
-            margin-bottom: 6px;
+        .pricelist-download-btn:hover {
+            background-color: #b08d4b;
         }
 
         /* FAQ Styling */
@@ -498,196 +416,41 @@
             </div>
         </section>
 
-        <!-- PRICELIST & KATALOG RESMI (FOTO THUMBNAIL 1:1) -->
+        <!-- GRID GALLERY PRICELIST PDF (1080x1920 PORTRAIT) -->
         <section class="page-section">
             <div class="section-card">
-                <h2 class="section-title">Pricelist PDF</h2>
-                <div class="section-subtitle">Pilih Tema & Unduh Katalog</div>
+                <h2 class="section-title">Katalog & Pricelist</h2>
+                <div class="section-subtitle">Klik untuk Unduh PDF</div>
 
-                <div class="pdf-list">
-                    <!-- Tombol PDF 1 -->
-                    <a class="pdf-item-btn" href="#" onclick="alert('File PDF dummy: Pricelist Akademik & Personal'); return false;">
-                        <div class="pdf-thumb-1x1">
-                            <img src="https://via.placeholder.com/150x150/E8E2D9/33302E?text=Sidang" alt="Edisi Sidang">
+                <div class="pricelist-grid">
+                    
+                    <!-- Item 1 -->
+                    <a class="pricelist-card" href="path/to/christmas-2026.pdf" download="Ivyhampers_Christmas_2026.pdf">
+                        <div class="pricelist-img-box">
+                            <img src="https://lh3.googleusercontent.com/d/1RblYYiU5Il3LyaJGENV3o6f60st1WOWf=s0" alt="Christmas Hampers">
                         </div>
-                        <div class="pdf-text-box">
-                            <div class="pdf-title-text">🎓 Sidang & Graduation</div>
-                            <div class="pdf-sub-text">Hardbox, snack & bouquet</div>
+                        <div class="pricelist-info">
+                            <div class="pricelist-title">2026 Christmas Hampers</div>
+                            <span class="pricelist-download-btn"><i class="fa-solid fa-file-pdf"></i> Download</span>
                         </div>
-                        <span class="pdf-badge">PDF</span>
+                    </a>
+                    
+                    <!-- Item 2 -->
+                    <a class="pricelist-card" href="/2026natal" >
+                        <div class="pricelist-img-box">
+                            <img src="https://lh3.googleusercontent.com/d/1FPJuU9AwM60EoV3YGcn_Xl5SYxCYXFlP=s0" alt="Christmas Hampers">
+                        </div>
+                        <div class="pricelist-info">
+                            <div class="pricelist-title">2026 Eid Hampers</div>
+                            <span class="pricelist-download-btn"><i class="fa-solid fa-file-pdf"></i> Lihat</span>
+                        </div>
                     </a>
 
-                    <!-- Tombol PDF 2 -->
-                    <a class="pdf-item-btn" href="#" onclick="alert('File PDF dummy: Pricelist Lamaran & Wedding'); return false;">
-                        <div class="pdf-thumb-1x1">
-                            <img src="https://via.placeholder.com/150x150/E8E2D9/33302E?text=Wedding" alt="Edisi Wedding">
-                        </div>
-                        <div class="pdf-text-box">
-                            <div class="pdf-title-text">💍 Lamaran & Wedding</div>
-                            <div class="pdf-sub-text">Gift box & cangkir keramik</div>
-                        </div>
-                        <span class="pdf-badge">PDF</span>
-                    </a>
-
-                    <!-- Tombol PDF 3 -->
-                    <a class="pdf-item-btn" href="#" onclick="alert('File PDF dummy: Pricelist Duka Cita'); return false;">
-                        <div class="pdf-thumb-1x1">
-                            <img src="https://via.placeholder.com/150x150/E8E2D9/33302E?text=Duka+Cita" alt="Edisi Duka Cita">
-                        </div>
-                        <div class="pdf-text-box">
-                            <div class="pdf-title-text">🕊️ Duka Cita (Sympathy)</div>
-                            <div class="pdf-sub-text">Teh herbal & cookies premium</div>
-                        </div>
-                        <span class="pdf-badge">PDF</span>
-                    </a>
-
-                    <!-- Tombol PDF 4 -->
-                    <a class="pdf-item-btn" href="#" onclick="alert('File PDF dummy: Pricelist Syukuran Umroh'); return false;">
-                        <div class="pdf-thumb-1x1">
-                            <img src="https://via.placeholder.com/150x150/E8E2D9/33302E?text=Umroh" alt="Edisi Umroh">
-                        </div>
-                        <div class="pdf-text-box">
-                            <div class="pdf-title-text">🕋 Syukuran Umroh & Haji</div>
-                            <div class="pdf-sub-text">Zam-zam, kurma & sajadah</div>
-                        </div>
-                        <span class="pdf-badge">PDF</span>
-                    </a>
-
-                    <!-- Tombol PDF 5 -->
-                    <a class="pdf-item-btn" href="#" onclick="alert('File PDF dummy: Pricelist Corporate'); return false;">
-                        <div class="pdf-thumb-1x1">
-                            <img src="https://via.placeholder.com/150x150/E8E2D9/33302E?text=Corporate" alt="Edisi Corporate">
-                        </div>
-                        <div class="pdf-text-box">
-                            <div class="pdf-title-text">🏢 Corporate & Bulk Order</div>
-                            <div class="pdf-sub-text">Custom branding logo instansi</div>
-                        </div>
-                        <span class="pdf-badge">PDF</span>
-                    </a>
-
-                    <!-- Tombol PDF 6 -->
-                    <a class="pdf-item-btn" href="#" onclick="alert('File PDF dummy: Pricelist Hari Raya'); return false;">
-                        <div class="pdf-thumb-1x1">
-                            <img src="https://via.placeholder.com/150x150/E8E2D9/33302E?text=Hari+Raya" alt="Edisi Hari Raya">
-                        </div>
-                        <div class="pdf-text-box">
-                            <div class="pdf-title-text">🌙 Hari Raya (Lebaran/Natal)</div>
-                            <div class="pdf-sub-text">Edisi dekorasi spesial raya</div>
-                        </div>
-                        <span class="pdf-badge">PDF</span>
-                    </a>
                 </div>
 
                 <a class="btn-wa" href="https://wa.me/6285117076637?text=Halo%20Ivyhampers,%20saya%20ingin%20konsultasi%20custom%20pricelist" target="_blank">
                     <i class="fa-brands fa-whatsapp"></i> Konsultasi Price List Custom
                 </a>
-            </div>
-        </section>
-
-        <!-- SECTION TESTIMONI -->
-        <section class="page-section">
-            <div class="section-card">
-                <h2 class="section-title">Testimoni</h2>
-                <div class="section-subtitle">Ulasan Asli Pembeli</div>
-
-                <div class="testi-list">
-                    <!-- Testimoni 1 -->
-                    <div class="testi-card">
-                        <div class="testi-body">
-                            <div>
-                                <div class="testi-stars">
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                </div>
-                                <div class="testi-bought-tag">Beli: Hampers Duka Cita</div>
-                                <div class="testi-text">
-                                    "Hampers duka citanya sangat elegan & menenangkan. Adminnya ramah banget, pengiriman ke Surabaya instan langsung sampai tepat waktu."
-                                </div>
-                            </div>
-                            <div class="testi-user">
-                                <span>Kak Sarah M.</span>
-                                <small>Surabaya</small>
-                            </div>
-                        </div>
-                        <div class="testi-prod-img-right">
-                            <img src="https://via.placeholder.com/1080x1440/E8E2D9/33302E?text=Duka+Cita+1080x1440" alt="Produk Duka Cita">
-                        </div>
-                    </div>
-
-                    <!-- Testimoni 2 -->
-                    <div class="testi-card">
-                        <div class="testi-body">
-                            <div>
-                                <div class="testi-stars">
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                </div>
-                                <div class="testi-bought-tag">Beli: Corporate Bulk (80 Pcs)</div>
-                                <div class="testi-text">
-                                    "Pesan 80 pcs hampers corporate untuk event instansi di Sidoarjo, pengerjaannya sangat rapi, pita & branding logonya eksklusif sekali!"
-                                </div>
-                            </div>
-                            <div class="testi-user">
-                                <span>PT Utama Nusantara</span>
-                                <small>Sidoarjo</small>
-                            </div>
-                        </div>
-                        <div class="testi-prod-img-right">
-                            <img src="https://via.placeholder.com/1080x1440/E8E2D9/33302E?text=Corporate+1080x1440" alt="Produk Corporate">
-                        </div>
-                    </div>
-
-                    <!-- Testimoni 3 -->
-                    <div class="testi-card">
-                        <div class="testi-body">
-                            <div>
-                                <div class="testi-stars">
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                </div>
-                                <div class="testi-bought-tag">Beli: Hampers Sidang Skripsi</div>
-                                <div class="testi-text">
-                                    "Bagus banget gift box sidang skripsi buat temen! Pitanya manis dan isian snack-nya terkurasi banget. Sukses terus Ivyhampers!"
-                                </div>
-                            </div>
-                            <div class="testi-user">
-                                <span>Dinda P.</span>
-                                <small>Sidoarjo</small>
-                            </div>
-                        </div>
-                        <div class="testi-prod-img-right">
-                            <img src="https://via.placeholder.com/1080x1440/E8E2D9/33302E?text=Sidang+1080x1440" alt="Produk Sidang">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- TENTANG KAMI -->
-        <section class="page-section">
-            <div class="section-card about-box">
-                <h2 class="section-title">Tentang Kami</h2>
-                <div class="section-subtitle">Ivyhampers Sidoarjo</div>
-
-                <p>Setiap momen berharga layak dirayakan dengan apresiasi berkesan. <strong>Ivyhampers</strong> hadir sebagai penyedia layanan hampers & gift box eksklusif di Sidoarjo dan Surabaya.</p>
-
-                <p>Kami mengusung konsep <em>elegant, modern, dan simple</em> pada setiap kurasi isian, kemasan, hingga pita akhir.</p>
-
-                <div class="sub-header">Layanan Momen Anda</div>
-                <ul>
-                    <li><strong>Bahagia & Personal:</strong> Lamaran, Wedding, Sidang Skripsi, Ulang Tahun, Hari Raya.</li>
-                    <li><strong>Simpati & Penghormatan:</strong> Duka Cita (Sympathy Gift) & Syukuran Umroh/Haji.</li>
-                    <li><strong>Corporate:</strong> Pemesanan skala besar untuk souvenir instansi & perusahaan.</li>
-                </ul>
             </div>
         </section>
 
@@ -744,7 +507,7 @@
                     <h3>Workshop & Lokasi</h3>
                     <p>Sidoarjo & Surabaya, Jawa Timur</p>
                     <a class="contact-link" href="https://maps.app.goo.gl/VRh3sMRicue4fDyR7" target="_blank">
-                        <i class="fa-solid fa-location-dot"></i> Buka Google Maps &rarr;
+                        <i class="fa-solid fa-location-dot"></i> Buka Google Maps →
                     </a>
                 </div>
 
@@ -763,7 +526,7 @@
 
         <!-- Footer -->
         <footer>
-            <p>&copy; 2026 <span>Ivyhampers</span> Sidoarjo. All Rights Reserved.</p>
+            <p>© 2026 <span>Ivyhampers</span> Sidoarjo. All Rights Reserved.</p>
         </footer>
 
     </div>
