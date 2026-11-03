@@ -11,12 +11,13 @@
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23C5A059'/><text x='50%' y='65%' font-family='Georgia, serif' font-size='50' font-weight='bold' fill='%23FFFFFF' text-anchor='middle'>IH</text></svg>">
 
-    <!-- Google Fonts -->
+    <!-- Preconnect ke CDN Gambar untuk Mempercepat Koneksi DNS/TLS -->
+    <link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin>
+
+    <!-- Google Fonts & Font Awesome Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-
-    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
@@ -101,50 +102,55 @@
         /* Judul Halaman */
         .page-header {
             text-align: center;
-            padding: 24px 20px 16px;
+            padding: 20px 16px 12px;
         }
 
         .page-header h1 {
             font-family: 'Cormorant Garamond', serif;
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             color: var(--text-dark);
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         .page-header p {
-            font-size: 0.82rem;
+            font-size: 0.78rem;
             color: var(--text-muted);
         }
 
-        /* Katalog Container (1 Column Layout) */
-        .catalog-container {
-            padding: 0 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
+        /* --- KATALOG CONTAINER 2 KOLOM --- */
+        .catalog-grid {
+            padding: 0 12px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
         }
 
         .catalog-card {
             background-color: var(--card-cream);
-            border-radius: 12px;
+            border-radius: 8px;
             overflow: hidden;
             border: 1px solid var(--border-color);
             box-shadow: var(--shadow);
             cursor: pointer;
+            content-visibility: auto; /* Optimasi Rendering Browser */
+            contain-intrinsic-size: 100px 200px;
+            position: relative;
+            aspect-ratio: 9 / 16;
         }
 
         .catalog-card img {
             width: 100%;
-            height: auto;
+            height: 100%;
+            object-fit: cover;
             display: block;
             transition: transform 0.3s ease;
         }
 
         .catalog-card:hover img {
-            transform: scale(1.02);
+            transform: scale(1.04);
         }
 
-        /* --- LIGHTBOX MODAL (PREVIEW GAMBAR BESAR) --- */
+        /* LIGHTBOX MODAL (PREVIEW GAMBAR BESAR) */
         .lightbox-modal {
             display: none;
             position: fixed;
@@ -153,11 +159,11 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.85);
+            background-color: rgba(0, 0, 0, 0.88);
             backdrop-filter: blur(4px);
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 16px;
             opacity: 0;
             transition: opacity 0.3s ease;
         }
@@ -177,14 +183,13 @@
 
         .lightbox-close {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 16px;
+            right: 16px;
             color: #FFFFFF;
-            font-size: 28px;
-            font-weight: bold;
+            font-size: 24px;
             cursor: pointer;
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             background: rgba(255, 255, 255, 0.2);
             border-radius: 50%;
             display: flex;
@@ -254,7 +259,7 @@
 
         <!-- Sticky Navigasi Header -->
         <header>
-            <a href="https://ivyhampers.my.id/" class="btn-back">
+            <a href="/" class="btn-back">
                 <i class="fa-solid fa-arrow-left"></i> Kembali
             </a>
             <div class="header-title">Ivy<span>hampers</span></div>
@@ -266,99 +271,99 @@
             <p>Klik gambar untuk memperbesar tampilan</p>
         </div>
 
-        <!-- Single Column Catalog List -->
-        <main class="catalog-container">
+        <!-- Grid Katalog 2 Kolom -->
+        <main class="catalog-grid">
 
             <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1vkJJN99i28ye20WmGZyhYSt4_7_UfsUh=s0')">
-                <img src="https://lh3.googleusercontent.com/d/1vkJJN99i28ye20WmGZyhYSt4_7_UfsUh=s1600" alt="Katalog Ivyhampers 1" loading="lazy">
+                <img src="https://lh3.googleusercontent.com/d/1vkJJN99i28ye20WmGZyhYSt4_7_UfsUh=s800" alt="Katalog 1" loading="lazy" decoding="async">
             </div>
 
             <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1no7DvCCPOxfc5ovbNv0oYVfc623XUlTK=s0')">
-                <img src="https://lh3.googleusercontent.com/d/1no7DvCCPOxfc5ovbNv0oYVfc623XUlTK=s1600" alt="Katalog Ivyhampers 2" loading="lazy">
+                <img src="https://lh3.googleusercontent.com/d/1no7DvCCPOxfc5ovbNv0oYVfc623XUlTK=s800" alt="Katalog 2" loading="lazy" decoding="async">
             </div>
 
             <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1HB_FvVRkpzVWDbM1sLzx7Qna_TtYMnQS=s0')">
-                <img src="https://lh3.googleusercontent.com/d/1HB_FvVRkpzVWDbM1sLzx7Qna_TtYMnQS=s1600" alt="Katalog Ivyhampers 3" loading="lazy">
+                <img src="https://lh3.googleusercontent.com/d/1HB_FvVRkpzVWDbM1sLzx7Qna_TtYMnQS=s800" alt="Katalog 3" loading="lazy" decoding="async">
             </div>
 
             <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1hf5W9n8Kz_2M5tWpd99ATx4XMDQf7ckM=s0')">
-                <img src="https://lh3.googleusercontent.com/d/1hf5W9n8Kz_2M5tWpd99ATx4XMDQf7ckM=s1600" alt="Katalog Ivyhampers 4" loading="lazy">
+                <img src="https://lh3.googleusercontent.com/d/1hf5W9n8Kz_2M5tWpd99ATx4XMDQf7ckM=s800" alt="Katalog 4" loading="lazy" decoding="async">
             </div>
 
             <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1tzXSU6gjqcIr5Rie2f-iTapxmRNa9czp=s0')">
-                <img src="https://lh3.googleusercontent.com/d/1tzXSU6gjqcIr5Rie2f-iTapxmRNa9czp=s1600" alt="Katalog Ivyhampers 5" loading="lazy">
+                <img src="https://lh3.googleusercontent.com/d/1tzXSU6gjqcIr5Rie2f-iTapxmRNa9czp=s800" alt="Katalog 5" loading="lazy" decoding="async">
             </div>
 
             <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1sJlAj0630UiGW0SZ0OViic4vDBe398Pv=s0')">
-                <img src="https://lh3.googleusercontent.com/d/1sJlAj0630UiGW0SZ0OViic4vDBe398Pv=s1600" alt="Katalog Ivyhampers 6" loading="lazy">
+                <img src="https://lh3.googleusercontent.com/d/1sJlAj0630UiGW0SZ0OViic4vDBe398Pv=s800" alt="Katalog 6" loading="lazy" decoding="async">
             </div>
 
             <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1ANznqWcWVd-17e2jvpyYHPBU16HUnmQT=s0')">
-                <img src="https://lh3.googleusercontent.com/d/1ANznqWcWVd-17e2jvpyYHPBU16HUnmQT=s1600" alt="Katalog Ivyhampers 7" loading="lazy">
+                <img src="https://lh3.googleusercontent.com/d/1ANznqWcWVd-17e2jvpyYHPBU16HUnmQT=s800" alt="Katalog 7" loading="lazy" decoding="async">
             </div>
 
             <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1IMQT6-aDEJsR_EWdU4NW1B8JvIRtik0f=s0')">
-                <img src="https://lh3.googleusercontent.com/d/1IMQT6-aDEJsR_EWdU4NW1B8JvIRtik0f=s1600" alt="Katalog Ivyhampers 8" loading="lazy">
+                <img src="https://lh3.googleusercontent.com/d/1IMQT6-aDEJsR_EWdU4NW1B8JvIRtik0f=s800" alt="Katalog 8" loading="lazy" decoding="async">
             </div>
 
             <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1RA4Y-_qKD2dqNYPK2SQm02cWNCazpp3B=s0')">
-                <img src="https://lh3.googleusercontent.com/d/1RA4Y-_qKD2dqNYPK2SQm02cWNCazpp3B=s1600" alt="Katalog Ivyhampers 9" loading="lazy">
+                <img src="https://lh3.googleusercontent.com/d/1RA4Y-_qKD2dqNYPK2SQm02cWNCazpp3B=s800" alt="Katalog 9" loading="lazy" decoding="async">
             </div>
 
             <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/19EAHCNnzUfhJtx4L88XBphn6it4lnjWm=s0')">
-                <img src="https://lh3.googleusercontent.com/d/19EAHCNnzUfhJtx4L88XBphn6it4lnjWm=s1600" alt="Katalog Ivyhampers 10" loading="lazy">
+                <img src="https://lh3.googleusercontent.com/d/19EAHCNnzUfhJtx4L88XBphn6it4lnjWm=s800" alt="Katalog 10" loading="lazy" decoding="async">
             </div>
 
             <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1spFbg0maKjA4N-GAe0o0UDmmW0hbv6ex=s0')">
-                <img src="https://lh3.googleusercontent.com/d/1spFbg0maKjA4N-GAe0o0UDmmW0hbv6ex=s1600" alt="Katalog Ivyhampers 11" loading="lazy">
+                <img src="https://lh3.googleusercontent.com/d/1spFbg0maKjA4N-GAe0o0UDmmW0hbv6ex=s800" alt="Katalog 11" loading="lazy" decoding="async">
             </div>
 
             <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1CdYmde73MeCYbhqKRLRzXDPER2viYWfj=s0')">
-                <img src="https://lh3.googleusercontent.com/d/1CdYmde73MeCYbhqKRLRzXDPER2viYWfj=s1600" alt="Katalog Ivyhampers 12" loading="lazy">
+                <img src="https://lh3.googleusercontent.com/d/1CdYmde73MeCYbhqKRLRzXDPER2viYWfj=s800" alt="Katalog 12" loading="lazy" decoding="async">
             </div>
 
             <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1S1d0M2cT08SiIhK30h6klm-HK5U6wHys=s0')">
-                <img src="https://lh3.googleusercontent.com/d/1S1d0M2cT08SiIhK30h6klm-HK5U6wHys=s1600" alt="Katalog Ivyhampers 13" loading="lazy">
+                <img src="https://lh3.googleusercontent.com/d/1S1d0M2cT08SiIhK30h6klm-HK5U6wHys=s800" alt="Katalog 13" loading="lazy" decoding="async">
             </div>
 
             <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1EfYvvLv81FZktocNufDgogPIxWNHTNw4=s0')">
-                <img src="https://lh3.googleusercontent.com/d/1EfYvvLv81FZktocNufDgogPIxWNHTNw4=s1600" alt="Katalog Ivyhampers 14" loading="lazy">
+                <img src="https://lh3.googleusercontent.com/d/1EfYvvLv81FZktocNufDgogPIxWNHTNw4=s800" alt="Katalog 14" loading="lazy" decoding="async">
             </div>
 
             <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/13z-gTq6E1MPUvSdJ1Uycnk2sBfH8R3ZL=s0')">
-                <img src="https://lh3.googleusercontent.com/d/13z-gTq6E1MPUvSdJ1Uycnk2sBfH8R3ZL=s1600" alt="Katalog Ivyhampers 15" loading="lazy">
+                <img src="https://lh3.googleusercontent.com/d/13z-gTq6E1MPUvSdJ1Uycnk2sBfH8R3ZL=s800" alt="Katalog 15" loading="lazy" decoding="async">
             </div>
 
             <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1UY7XTrMZu-JeCuhycvKjNmgB9_SqUpIZ=s0')">
-                <img src="https://lh3.googleusercontent.com/d/1UY7XTrMZu-JeCuhycvKjNmgB9_SqUpIZ=s1600" alt="Katalog Ivyhampers 16" loading="lazy">
+                <img src="https://lh3.googleusercontent.com/d/1UY7XTrMZu-JeCuhycvKjNmgB9_SqUpIZ=s800" alt="Katalog 16" loading="lazy" decoding="async">
             </div>
 
             <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1y_fg0dZgSjf3oBA7w7r-u2CeiZVbSmUb=s0')">
-                <img src="https://lh3.googleusercontent.com/d/1y_fg0dZgSjf3oBA7w7r-u2CeiZVbSmUb=s1600" alt="Katalog Ivyhampers 17" loading="lazy">
+                <img src="https://lh3.googleusercontent.com/d/1y_fg0dZgSjf3oBA7w7r-u2CeiZVbSmUb=s800" alt="Katalog 17" loading="lazy" decoding="async">
             </div>
 
             <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1yH-i407hpaPLl6V4KBYdGLdPk5Ja4TtP=s0')">
-                <img src="https://lh3.googleusercontent.com/d/1yH-i407hpaPLl6V4KBYdGLdPk5Ja4TtP=s1600" alt="Katalog Ivyhampers 18" loading="lazy">
+                <img src="https://lh3.googleusercontent.com/d/1yH-i407hpaPLl6V4KBYdGLdPk5Ja4TtP=s800" alt="Katalog 18" loading="lazy" decoding="async">
             </div>
 
             <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1YmJ2lWpDrArFQiq4oF3NzRTfz2oexE2f=s0')">
-                <img src="https://lh3.googleusercontent.com/d/1YmJ2lWpDrArFQiq4oF3NzRTfz2oexE2f=s1600" alt="Katalog Ivyhampers 19" loading="lazy">
+                <img src="https://lh3.googleusercontent.com/d/1YmJ2lWpDrArFQiq4oF3NzRTfz2oexE2f=s800" alt="Katalog 19" loading="lazy" decoding="async">
             </div>
 
             <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1OvjTNIubX1OHzxW404_B8R493-ahwbrA=s0')">
-                <img src="https://lh3.googleusercontent.com/d/1OvjTNIubX1OHzxW404_B8R493-ahwbrA=s1600" alt="Katalog Ivyhampers 20" loading="lazy">
+                <img src="https://lh3.googleusercontent.com/d/1OvjTNIubX1OHzxW404_B8R493-ahwbrA=s800" alt="Katalog 20" loading="lazy" decoding="async">
             </div>
 
             <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1bVb32LTC5dELciYZ4FC-tNEmFEdUbjv_=s0')">
-                <img src="https://lh3.googleusercontent.com/d/1bVb32LTC5dELciYZ4FC-tNEmFEdUbjv_=s1600" alt="Katalog Ivyhampers 21" loading="lazy">
+                <img src="https://lh3.googleusercontent.com/d/1bVb32LTC5dELciYZ4FC-tNEmFEdUbjv_=s800" alt="Katalog 21" loading="lazy" decoding="async">
             </div>
 
             <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1NDyKO54sqfcKlv1UqQt_oR34KSuZPOM1=s0')">
-                <img src="https://lh3.googleusercontent.com/d/1NDyKO54sqfcKlv1UqQt_oR34KSuZPOM1=s1600" alt="Katalog Ivyhampers 22" loading="lazy">
+                <img src="https://lh3.googleusercontent.com/d/1NDyKO54sqfcKlv1UqQt_oR34KSuZPOM1=s800" alt="Katalog 22" loading="lazy" decoding="async">
             </div>
 
             <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1YSBZxpISB_aIsGg9g8Hy45v-Ro6oaevo=s0')">
-                <img src="https://lh3.googleusercontent.com/d/1YSBZxpISB_aIsGg9g8Hy45v-Ro6oaevo=s1600" alt="Katalog Ivyhampers 23" loading="lazy">
+                <img src="https://lh3.googleusercontent.com/d/1YSBZxpISB_aIsGg9g8Hy45v-Ro6oaevo=s800" alt="Katalog 23" loading="lazy" decoding="async">
             </div>
 
         </main>
