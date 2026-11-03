@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Katalog Resmi — Ivyhampers</title>
+
+    <!-- Meta Tags SEO -->
+    <meta name="description" content="Katalog Lengkap Ivyhampers Sidoarjo & Surabaya — Lihat koleksi hampers & gift box premium kami.">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23C5A059'/><text x='50%' y='65%' font-family='Georgia, serif' font-size='50' font-weight='bold' fill='%23FFFFFF' text-anchor='middle'>IH</text></svg>">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-cream: #FAF7F2;
+            --card-cream: #FFFFFF;
+            --text-dark: #33302E;
+            --text-muted: #66605C;
+            --accent-gold: #C5A059;
+            --border-color: #E8E2D9;
+            --wa-green: #25D366;
+            --wa-green-hover: #20ba5a;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #EAE6DF;
+            color: var(--text-dark);
+            display: flex;
+            justify-content: center;
+        }
+
+        .mobile-wrapper {
+            width: 100%;
+            max-width: 480px;
+            background-color: var(--bg-cream);
+            min-height: 100vh;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.1);
+            position: relative;
+            padding-bottom: 90px;
+        }
+
+        /* Sticky Header Navigasi */
+        header {
+            background-color: var(--card-cream);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-dark);
+            font-size: 0.88rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .btn-back:hover {
+            color: var(--accent-gold);
+        }
+
+        .header-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .header-title span {
+            color: var(--accent-gold);
+        }
+
+        /* Judul Halaman */
+        .page-header {
+            text-align: center;
+            padding: 24px 20px 16px;
+        }
+
+        .page-header h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .page-header p {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+        }
+
+        /* Katalog Container (1 Column Layout) */
+        .catalog-container {
+            padding: 0 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .catalog-card {
+            background-color: var(--card-cream);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            cursor: pointer;
+        }
+
+        .catalog-card img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+
+        .catalog-card:hover img {
+            transform: scale(1.02);
+        }
+
+        /* --- LIGHTBOX MODAL (PREVIEW GAMBAR BESAR) --- */
+        .lightbox-modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(4px);
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .lightbox-modal.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .lightbox-content {
+            max-width: 100%;
+            max-height: 90vh;
+            border-radius: 8px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+            object-fit: contain;
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #FFFFFF;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .lightbox-close:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Floating Sticky Bar Bottom WA */
+        .floating-wa-bar {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            background-color: var(--card-cream);
+            padding: 12px 20px;
+            border-top: 1px solid var(--border-color);
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.05);
+            z-index: 1000;
+        }
+
+        .btn-wa {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            background-color: var(--wa-green);
+            color: #FFFFFF !important;
+            text-decoration: none;
+            padding: 12px 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 30px;
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.25);
+            transition: var(--transition);
+        }
+
+        .btn-wa:hover {
+            background-color: var(--wa-green-hover);
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--text-dark);
+            color: rgba(255, 255, 255, 0.7);
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            margin-top: 30px;
+        }
+
+        footer span {
+            color: var(--accent-gold);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="mobile-wrapper">
+
+        <!-- Sticky Navigasi Header -->
+        <header>
+            <a href="https://ivyhampers.my.id/" class="btn-back">
+                <i class="fa-solid fa-arrow-left"></i> Kembali
+            </a>
+            <div class="header-title">Ivy<span>hampers</span></div>
+        </header>
+
+        <!-- Header Judul -->
+        <div class="page-header">
+            <h1>Katalog Produk</h1>
+            <p>Klik gambar untuk memperbesar tampilan</p>
+        </div>
+
+        <!-- Single Column Catalog List -->
+        <main class="catalog-container">
+
+            <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1vkJJN99i28ye20WmGZyhYSt4_7_UfsUh=s0')">
+                <img src="https://lh3.googleusercontent.com/d/1vkJJN99i28ye20WmGZyhYSt4_7_UfsUh=s1600" alt="Katalog Ivyhampers 1" loading="lazy">
+            </div>
+
+            <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1no7DvCCPOxfc5ovbNv0oYVfc623XUlTK=s0')">
+                <img src="https://lh3.googleusercontent.com/d/1no7DvCCPOxfc5ovbNv0oYVfc623XUlTK=s1600" alt="Katalog Ivyhampers 2" loading="lazy">
+            </div>
+
+            <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1HB_FvVRkpzVWDbM1sLzx7Qna_TtYMnQS=s0')">
+                <img src="https://lh3.googleusercontent.com/d/1HB_FvVRkpzVWDbM1sLzx7Qna_TtYMnQS=s1600" alt="Katalog Ivyhampers 3" loading="lazy">
+            </div>
+
+            <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1hf5W9n8Kz_2M5tWpd99ATx4XMDQf7ckM=s0')">
+                <img src="https://lh3.googleusercontent.com/d/1hf5W9n8Kz_2M5tWpd99ATx4XMDQf7ckM=s1600" alt="Katalog Ivyhampers 4" loading="lazy">
+            </div>
+
+            <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1tzXSU6gjqcIr5Rie2f-iTapxmRNa9czp=s0')">
+                <img src="https://lh3.googleusercontent.com/d/1tzXSU6gjqcIr5Rie2f-iTapxmRNa9czp=s1600" alt="Katalog Ivyhampers 5" loading="lazy">
+            </div>
+
+            <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1sJlAj0630UiGW0SZ0OViic4vDBe398Pv=s0')">
+                <img src="https://lh3.googleusercontent.com/d/1sJlAj0630UiGW0SZ0OViic4vDBe398Pv=s1600" alt="Katalog Ivyhampers 6" loading="lazy">
+            </div>
+
+            <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1ANznqWcWVd-17e2jvpyYHPBU16HUnmQT=s0')">
+                <img src="https://lh3.googleusercontent.com/d/1ANznqWcWVd-17e2jvpyYHPBU16HUnmQT=s1600" alt="Katalog Ivyhampers 7" loading="lazy">
+            </div>
+
+            <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1IMQT6-aDEJsR_EWdU4NW1B8JvIRtik0f=s0')">
+                <img src="https://lh3.googleusercontent.com/d/1IMQT6-aDEJsR_EWdU4NW1B8JvIRtik0f=s1600" alt="Katalog Ivyhampers 8" loading="lazy">
+            </div>
+
+            <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1RA4Y-_qKD2dqNYPK2SQm02cWNCazpp3B=s0')">
+                <img src="https://lh3.googleusercontent.com/d/1RA4Y-_qKD2dqNYPK2SQm02cWNCazpp3B=s1600" alt="Katalog Ivyhampers 9" loading="lazy">
+            </div>
+
+            <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/19EAHCNnzUfhJtx4L88XBphn6it4lnjWm=s0')">
+                <img src="https://lh3.googleusercontent.com/d/19EAHCNnzUfhJtx4L88XBphn6it4lnjWm=s1600" alt="Katalog Ivyhampers 10" loading="lazy">
+            </div>
+
+            <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1spFbg0maKjA4N-GAe0o0UDmmW0hbv6ex=s0')">
+                <img src="https://lh3.googleusercontent.com/d/1spFbg0maKjA4N-GAe0o0UDmmW0hbv6ex=s1600" alt="Katalog Ivyhampers 11" loading="lazy">
+            </div>
+
+            <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1CdYmde73MeCYbhqKRLRzXDPER2viYWfj=s0')">
+                <img src="https://lh3.googleusercontent.com/d/1CdYmde73MeCYbhqKRLRzXDPER2viYWfj=s1600" alt="Katalog Ivyhampers 12" loading="lazy">
+            </div>
+
+            <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1S1d0M2cT08SiIhK30h6klm-HK5U6wHys=s0')">
+                <img src="https://lh3.googleusercontent.com/d/1S1d0M2cT08SiIhK30h6klm-HK5U6wHys=s1600" alt="Katalog Ivyhampers 13" loading="lazy">
+            </div>
+
+            <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1EfYvvLv81FZktocNufDgogPIxWNHTNw4=s0')">
+                <img src="https://lh3.googleusercontent.com/d/1EfYvvLv81FZktocNufDgogPIxWNHTNw4=s1600" alt="Katalog Ivyhampers 14" loading="lazy">
+            </div>
+
+            <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/13z-gTq6E1MPUvSdJ1Uycnk2sBfH8R3ZL=s0')">
+                <img src="https://lh3.googleusercontent.com/d/13z-gTq6E1MPUvSdJ1Uycnk2sBfH8R3ZL=s1600" alt="Katalog Ivyhampers 15" loading="lazy">
+            </div>
+
+            <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1UY7XTrMZu-JeCuhycvKjNmgB9_SqUpIZ=s0')">
+                <img src="https://lh3.googleusercontent.com/d/1UY7XTrMZu-JeCuhycvKjNmgB9_SqUpIZ=s1600" alt="Katalog Ivyhampers 16" loading="lazy">
+            </div>
+
+            <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1y_fg0dZgSjf3oBA7w7r-u2CeiZVbSmUb=s0')">
+                <img src="https://lh3.googleusercontent.com/d/1y_fg0dZgSjf3oBA7w7r-u2CeiZVbSmUb=s1600" alt="Katalog Ivyhampers 17" loading="lazy">
+            </div>
+
+            <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1yH-i407hpaPLl6V4KBYdGLdPk5Ja4TtP=s0')">
+                <img src="https://lh3.googleusercontent.com/d/1yH-i407hpaPLl6V4KBYdGLdPk5Ja4TtP=s1600" alt="Katalog Ivyhampers 18" loading="lazy">
+            </div>
+
+            <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1YmJ2lWpDrArFQiq4oF3NzRTfz2oexE2f=s0')">
+                <img src="https://lh3.googleusercontent.com/d/1YmJ2lWpDrArFQiq4oF3NzRTfz2oexE2f=s1600" alt="Katalog Ivyhampers 19" loading="lazy">
+            </div>
+
+            <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1OvjTNIubX1OHzxW404_B8R493-ahwbrA=s0')">
+                <img src="https://lh3.googleusercontent.com/d/1OvjTNIubX1OHzxW404_B8R493-ahwbrA=s1600" alt="Katalog Ivyhampers 20" loading="lazy">
+            </div>
+
+            <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1bVb32LTC5dELciYZ4FC-tNEmFEdUbjv_=s0')">
+                <img src="https://lh3.googleusercontent.com/d/1bVb32LTC5dELciYZ4FC-tNEmFEdUbjv_=s1600" alt="Katalog Ivyhampers 21" loading="lazy">
+            </div>
+
+            <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1NDyKO54sqfcKlv1UqQt_oR34KSuZPOM1=s0')">
+                <img src="https://lh3.googleusercontent.com/d/1NDyKO54sqfcKlv1UqQt_oR34KSuZPOM1=s1600" alt="Katalog Ivyhampers 22" loading="lazy">
+            </div>
+
+            <div class="catalog-card" onclick="openLightbox('https://lh3.googleusercontent.com/d/1YSBZxpISB_aIsGg9g8Hy45v-Ro6oaevo=s0')">
+                <img src="https://lh3.googleusercontent.com/d/1YSBZxpISB_aIsGg9g8Hy45v-Ro6oaevo=s1600" alt="Katalog Ivyhampers 23" loading="lazy">
+            </div>
+
+        </main>
+
+        <!-- Footer -->
+        <footer>
+            <p>© 2026 <span>Ivyhampers</span> Sidoarjo. All Rights Reserved.</p>
+        </footer>
+
+        <!-- Floating WA Bar Bottom -->
+        <div class="floating-wa-bar">
+            <a href="https://wa.me/6285117076637?text=Halo%20Ivyhampers,%20saya%20ingin%20tanya%20mengenai%20katalog%20produk" class="btn-wa" target="_blank">
+                <i class="fa-brands fa-whatsapp"></i> Pesan via WhatsApp
+            </a>
+        </div>
+
+    </div>
+
+    <!-- Lightbox Modal Component -->
+    <div id="lightbox" class="lightbox-modal" onclick="closeLightbox(event)">
+        <span class="lightbox-close" onclick="closeLightbox(event)">×</span>
+        <img id="lightbox-img" class="lightbox-content" src="" alt="Preview Katalog">
+    </div>
+
+    <!-- JavaScript Lightbox -->
+    <script>
+        function openLightbox(imageSrc) {
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightbox-img');
+            lightboxImg.src = imageSrc;
+            lightbox.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox(event) {
+            if (event.target.id === 'lightbox' || event.target.classList.contains('lightbox-close')) {
+                const lightbox = document.getElementById('lightbox');
+                lightbox.classList.remove('show');
+                document.body.style.overflow = 'auto';
+            }
+        }
+    </script>
+
+</body>
+</html>
